@@ -16,7 +16,7 @@ class GooglePlay:
                                    Mobileclient.FROM_MAC_ADDRESS)
 
         if not logged_in:
-            raise Exception('Failed to log in.')
+            raise Exception("Failed to log in.")
 
     def get_station_tracks(self, name, count=100):
         station_id = self._get_station_id(name)
@@ -27,7 +27,7 @@ class GooglePlay:
             if station['name'] == name:
                 return station['id']
 
-        raise Exception('Radio station not found.')
+        raise Exception("Radio station not found.")
 
     def get_mp3(self, song_id):
         return self.api.get_stream_url(song_id)
