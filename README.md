@@ -12,4 +12,7 @@ $ apt-get install ffmpeg
 
 # SoCo/gmusicapi
 $ pip install -r requirements.txt
+
+# Configuration
+$ cp config.cfg.example config.cfg
 ```
