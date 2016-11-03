@@ -1,3 +1,8 @@
-[GooglePlay]
+[SonosDiscovery]
+master: Living Room
+
+[SonosSpeaker]
+volume: 25
+
+[SonosGooglePlay]
 email: example@domain.com
-password: pass123

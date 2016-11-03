@@ -1,8 +1,6 @@
-from config import Config
-from google_play import GooglePlay
-from sonos import Sonos
+from flask import Flask
+from sonos.google_play import GooglePlay
 
-config = Config()
 
-google_play = GooglePlay(config)
-sonos = Sonos(config)
+app = Flask(__name__)
+google_play = GooglePlay()

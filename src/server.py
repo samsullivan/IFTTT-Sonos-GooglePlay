@@ -1,27 +1,59 @@
-from flask import Flask, request
-from . import google_play, sonos
+from . import app, google_play
+from flask import request, make_response
+from sonos import Discovery, Speaker
 
-app = Flask(__name__)
 
-
-@app.route('/play', methods=['POST'])
-def play():
+def json_param(key, default=None, required=False):
     if request.json is None:
-        raise Exception("POST body must be formatted in JSON.")
-    if 'speaker' not in request.json:
-        raise Exception("Speaker is required.")
-    if 'station' not in request.json:
-        raise Exception("Station is required.")
+        raise Exception("JSON body expected.")
+    if required and key not in request.json:
+        raise Exception("JSON param missing.")
 
-    speaker = sonos.get_speaker_by_name(request.json['speaker'])
-    ip = speaker.ip_address
+    return request.json[key] if key in request.json else default
 
-    track = google_play.get_station_tracks(request.json['station'], 1).pop()
-    url = google_play.get_mp3(track['nid'])
 
-    sonos.play_song(ip, url)
+def get_speaker():
+    discovery = Discovery()
 
-    return "Playing."
+    speaker_name = json_param('speaker')
+    if speaker_name is not None:
+        speaker = discovery.get_speaker_by_name(speaker_name)
+    else:
+        group = discovery.get_master_group()
+        speaker = group.coordinator
+
+    if speaker is None:
+        raise Exception("Unable to find speaker.")
+
+    return Speaker(speaker)
+
+
+@app.route('/play/artist', methods=['POST'])
+def play_station():
+    speaker = get_speaker()
+
+    artist = json_param('artist', required=True)
+    result = google_play.find_artist(artist)
+
+    if result is not None:
+        speaker.queue_item(result)
+        speaker.play(play_mode='SHUFFLE_NOREPEAT')
+
+    return make_response()
+
+
+@app.route('/play/station', methods=['POST'])
+def play_station():
+    speaker = get_speaker()
+
+    station = json_param('station', required=True)
+    result = google_play.find_station(station)
+
+    if result is not None:
+        speaker.queue_item(result)
+        speaker.play()
+
+    return make_response()
 
 
 if __name__ == "__main__":

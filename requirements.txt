@@ -1,3 +1,2 @@
-soco
-gmusicapi
 Flask
+soco
