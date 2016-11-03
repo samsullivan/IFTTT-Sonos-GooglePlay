@@ -1,5 +1,5 @@
 from .discovery import Discovery
-from .speaker import Speaker
 from .google_play import GooglePlay
+from .controller import Controller
 
-__all__ = ['Discovery', 'Speaker', 'GooglePlay']
+__all__ = ['Discovery', 'GooglePlay', 'Controller']

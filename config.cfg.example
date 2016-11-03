@@ -4,8 +4,8 @@ api_key: abc123
 [SonosDiscovery]
 master: Living Room
 
-[SonosSpeaker]
-volume: 25
-
 [SonosGooglePlay]
 email: example@domain.com
+
+[SonosController]
+volume: 25

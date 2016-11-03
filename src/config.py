@@ -5,6 +5,7 @@ from os import path
 class Config:
 
     def __init__(self, section):
+        """Initialize a Config object with a specific section."""
         self._parser = ConfigParser.ConfigParser()
 
         filename = path.join(path.dirname(__file__), '../config.cfg')
@@ -18,5 +19,6 @@ class Config:
             data[option] = self._parser.get(section, option)
         return data
 
-    def get(self, key, default=None):
-        return self._section[key] if key in self._section else default
+    def get(self, option, default=None):
+        """Returns the configuration option's value."""
+        return self._section.get(option, default)
