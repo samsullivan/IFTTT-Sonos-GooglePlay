@@ -1,10 +1,11 @@
-from . import get_config
+from .. import Config
 
 
 class Speaker:
 
     def __init__(self, speaker):
-        self._settings = get_config('Speaker')
+        self._config = Config('SonosSpeaker')
+
         self._speaker = speaker
 
     def queue_item(self, item):
@@ -13,6 +14,6 @@ class Speaker:
 
     def play(self, play_mode='NORMAL'):
         self._speaker.play_mode = play_mode
-        self._speaker.volume = self._settings['volume']
+        self._speaker.volume = self._config.get('volume')
 
         self._speaker.play()

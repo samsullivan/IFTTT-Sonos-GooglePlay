@@ -1,9 +1,5 @@
-from ..config import Config
-
-
-def get_config(name):
-    config = Config()
-    return config.get('Sonos' + name)
-
+from .discovery import Discovery
+from .speaker import Speaker
+from .google_play import GooglePlay
 
 __all__ = ['Discovery', 'Speaker', 'GooglePlay']

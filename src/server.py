@@ -1,6 +1,9 @@
-from . import app, google_play
-from flask import request, make_response
-from sonos import Discovery, Speaker
+from flask import Flask, request, make_response
+app = Flask(__name__)
+
+import sonos
+discovery = sonos.Discovery()
+google_play = sonos.GooglePlay()
 
 
 def json_param(key, default=None, required=False):
@@ -13,9 +16,8 @@ def json_param(key, default=None, required=False):
 
 
 def get_speaker():
-    discovery = Discovery()
-
     speaker_name = json_param('speaker')
+
     if speaker_name is not None:
         speaker = discovery.get_speaker_by_name(speaker_name)
     else:
@@ -25,11 +27,11 @@ def get_speaker():
     if speaker is None:
         raise Exception("Unable to find speaker.")
 
-    return Speaker(speaker)
+    return sonos.Speaker(speaker)
 
 
 @app.route('/play/artist', methods=['POST'])
-def play_station():
+def play_artist():
     speaker = get_speaker()
 
     artist = json_param('artist', required=True)

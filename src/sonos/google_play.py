@@ -1,4 +1,4 @@
-from . import get_config
+from .. import Config
 from soco.music_services.music_service import MusicService
 from soco.music_services.accounts import Account
 
@@ -8,10 +8,10 @@ class GooglePlay:
     _service = None
 
     def __init__(self):
-        self._settings = get_config('GooglePlay')
+        self._config = Config('SonosGooglePlay')
 
         for account in Account.get_accounts_for_service('12345'):  # todo: right service_type
-            if account.username == self._settings['email']:
+            if account.username == self._config.get('email'):
                 self._service = MusicService('Google Play Music', account)
                 break
 

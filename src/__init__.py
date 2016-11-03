@@ -1,6 +1,3 @@
-from flask import Flask
-from sonos.google_play import GooglePlay
+from .config import Config
 
-
-app = Flask(__name__)
-google_play = GooglePlay()
+__all__ = ['Config']

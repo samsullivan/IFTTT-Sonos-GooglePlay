@@ -4,17 +4,19 @@ from os import path
 
 class Config:
 
-    def __init__(self):
-        self.parser = ConfigParser.ConfigParser()
+    def __init__(self, section):
+        self._parser = ConfigParser.ConfigParser()
 
         filename = path.join(path.dirname(__file__), '../config.cfg')
-        self.parser.read(filename)
+        self._parser.read(filename)
 
-    def get(self, section, key=None):
-        if key is None:
-            data = {}
-            for option in self.parser.options(section):
-                data[option] = self.get(section, option)
-            return data
-        else:
-            return self.parser.get(section, key)
+        self._section = self._get_section(section)
+
+    def _get_section(self, section):
+        data = {}
+        for option in self._parser.options(section):
+            data[option] = self._parser.get(section, option)
+        return data
+
+    def get(self, key, default=None):
+        return self._section[key] if key in self._section else default
