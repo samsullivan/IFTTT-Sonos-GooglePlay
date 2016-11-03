@@ -1,3 +1,6 @@
+[Flask]
+api_key: abc123
+
 [SonosDiscovery]
 master: Living Room
 
