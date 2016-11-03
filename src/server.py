@@ -26,19 +26,6 @@ def json_param(key, default=None, required=False):
     return request.json.get(key, default)
 
 
-def get_sonos_controller():
-    """Returns the sonos.Controller requested."""
-    speaker_name = json_param('speaker')
-
-    if speaker_name:
-        speaker = discovery.get_speaker_by_name(speaker_name)
-    else:
-        group = discovery.get_master_group()
-        speaker = group.coordinator
-
-    return sonos.Controller(speaker)
-
-
 def success_response():
     """Returns a Flask response for a successful request."""
     return jsonify(success=True), 200
@@ -76,7 +63,7 @@ def play_artist():
     if result is None:
         raise Exception("Artist not found.")
 
-    controller = get_sonos_controller()
+    controller = discovery.create_controller(json_param('speaker'))
     controller.queue_item(result)
     controller.play(play_mode='SHUFFLE_NOREPEAT')
 
@@ -93,7 +80,7 @@ def play_station():
     if result is None:
         raise Exception("Station not found.")
 
-    controller = get_sonos_controller()
+    controller = discovery.create_controller(json_param('speaker'))
     controller.queue_item(result)
     controller.play()
 
