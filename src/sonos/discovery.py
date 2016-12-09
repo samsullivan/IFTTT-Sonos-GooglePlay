@@ -13,28 +13,17 @@ class Discovery:
         if self._speakers is None:
             raise Exception("No speakers found.")
 
-    def create_controller(self, speaker_name=None):
-        """Creates a sonos.Controller from a given speaker/group."""
-        if speaker_name:
-            speaker = self._get_speaker_by_name(speaker_name)
-        else:
-            group = self._get_master_group()
-            speaker = group.coordinator
-
-        return Controller(speaker)
-
-    def _get_speaker_by_name(self, name):
+    def get_all(self):
+        controllers = []
         for speaker in self._speakers:
-            if speaker.player_name == name:
-                return speaker
+            controller = Controller(speaker)
+            controllers.append(controller)
+        return controllers
 
-        raise Exception("Speaker doesn't exist.")
-
-    def _get_master_group(self):
-        master = self._get_speaker_by_name(self._config.get('master'))
-
+    def get_by_name(self, speaker_name):
         for speaker in self._speakers:
-            if speaker.uid != master.uid:
-                speaker.join(master)
+            if speaker.player_name == speaker_name:
+                controller = Controller(speaker)
+                return controller
 
-        return master.group
+        raise Exception("Speaker not found.")

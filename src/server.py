@@ -1,29 +1,9 @@
-from . import Config
 from flask import Flask, request, jsonify
 from functools import wraps
 import sonos
 
 app = Flask(__name__)             # Initializes Flask.
 discovery = sonos.Discovery()     # Verifies the existence of speakers.
-google_play = sonos.GooglePlay()  # Verifies the existence of a Google Play Music account.
-
-
-def query_param(key, default=None, required=False):
-    """Returns an HTTP query parameter."""
-    if required and key not in request.args:
-        raise Exception("JSON param missing.")
-
-    return request.args.get(key, default)
-
-
-def json_param(key, default=None, required=False):
-    """Returns a parameter from the JSON body."""
-    if request.json is None:
-        raise Exception("JSON body expected.")
-    if required and key not in request.json:
-        raise Exception("JSON param missing.")
-
-    return request.json.get(key, default)
 
 
 def success_response():
@@ -33,56 +13,26 @@ def success_response():
 
 def failed_response(error="Unknown error occurred", status_code=500):
     """Returns a Flask response for a failed request."""
+    print error
     return jsonify(success=False, error=error), status_code
-
-
-def validate_api(f):
-    """Validates request via query param and configuration."""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        config = Config('Flask')
-        if query_param('api_key', required=True) != config.get('api_key'):
-            return failed_response("Invalid API key.", 403)
-        return f(*args, **kwargs)
-    return decorated
 
 
 @app.route('/')
 def index():
-    """A non-protected test endpoint."""
+    """A test endpoint."""
     return success_response()
 
 
-@app.route('/play/artist', methods=['POST'])
-@validate_api
-def play_artist():
-    """Shuffle an artist."""
-    artist = json_param('artist', required=True)
+@app.route('/action', methods=['POST'])
+def action():
+    result = request.json['result']
+    parameters = result['parameters']
 
-    result = google_play.find_artist(artist)
-    if result is None:
-        raise Exception("Artist not found.")
+    room = parameters.pop('room', None)
+    controllers = discovery.get_all() if not room else [discovery.get_by_name(room)]
 
-    controller = discovery.create_controller(json_param('speaker'))
-    controller.queue_item(result)
-    controller.play(play_mode='SHUFFLE_NOREPEAT')
-
-    return success_response()
-
-
-@app.route('/play/station', methods=['POST'])
-@validate_api
-def play_station():
-    """Start a station."""
-    station = json_param('station', required=True)
-
-    result = google_play.find_station(station)
-    if result is None:
-        raise Exception("Station not found.")
-
-    controller = discovery.create_controller(json_param('speaker'))
-    controller.queue_item(result)
-    controller.play()
+    for controller in controllers:
+        getattr(controller, result['action'])(parameters)
 
     return success_response()
 
